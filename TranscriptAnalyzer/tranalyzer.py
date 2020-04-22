@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 """
 Created on Thu Apr  2 08:30:55 2020
 
@@ -6,7 +6,6 @@ Created on Thu Apr  2 08:30:55 2020
 """
 
 import os.path, pandas as pd, argparse, statistics
-import seaborn as sns, matplotlib.pyplot as plt
 from multiprocessing import Pool
 from functools import partial
 
