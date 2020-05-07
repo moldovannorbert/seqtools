@@ -93,8 +93,9 @@ This line will create a consensus sequence of the reads used by LoRTIA for annot
 
 The output directory will contain the following subdirectories and files (main output files in __bold__):
 
-output/
+output/  
 ├── tmp/				-> Directory containing data used to create RefTranscriptome.fa and Transcripts.tsv
+
 │   ├── bam/			-> Mappings of reads to individual transcript sequences (taken from the reference genome).
 │   ├── consensus/		-> The consensus sequence of each transcript as individual files.
 │   ├── fa/				-> The sequence of reads per transcript taken from the .bam LoRTIA output.
