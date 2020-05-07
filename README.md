@@ -92,19 +92,18 @@ This line will create a consensus sequence of the reads used by LoRTIA for annot
 ```
 
 The output directory will contain the following subdirectories and files (main output files in __bold__):
-
+  
 output/  
-├── tmp/				-> Directory containing data used to create RefTranscriptome.fa and Transcripts.tsv
-
-│   ├── bam/			-> Mappings of reads to individual transcript sequences (taken from the reference genome).
-│   ├── consensus/		-> The consensus sequence of each transcript as individual files.
-│   ├── fa/				-> The sequence of reads per transcript taken from the .bam LoRTIA output.
-│   ├── refSeq/			-> The transcript sequences taken from the reference genome.
-│   └── vcf/			-> The VCF files with the variations per transcript.
-├── __RefTranscriptome.fa__	-> Fasta file containing the consensus sequence of transcripts.
-├── refSeq.tsv 			-> Data used to create RefTranscriptome.fa and Transcripts.tsv
-└── __Transcripts.tsv__		-> Table of transcripts containing read counts, referece and consensus sequences. 
- 
+├── tmp/				-> Directory containing data used to create RefTranscriptome.fa and Transcripts.tsv.  
+│	├── bam/			-> Mappings of reads to individual transcript sequences (taken from the reference genome).  
+│	├── consensus/		-> The consensus sequence of each transcript as individual files.  
+│	├── fa/				-> The sequence of reads per transcript taken from the .bam LoRTIA output.  
+│	├── refSeq/			-> The transcript sequences taken from the reference genome.  
+│	└── vcf/			-> The VCF files with the variations per transcript.  
+├── __RefTranscriptome.fa__	-> Fasta file containing the consensus sequence of transcripts.  
+├── refSeq.tsv 			-> Data used to create RefTranscriptome.fa and Transcripts.tsv.  
+└── __Transcripts.tsv__		-> Table of transcripts containing read counts, referece and consensus sequences.  
+  
 
 ## <a name="ReadStatistics"></a>ReadStatistics
 ReadStatistics is a tool for calculating and visualising descriptive statistics of mapped reads in bulk.
