@@ -83,7 +83,7 @@ You will need:
 
 To see the help menu type ‘-h’.
 ```sh
-./readstats.py –h
+./ReadConsensus.py –h
 ```
 
 This line will create a consensus sequence of the reads used by LoRTIA for annotating transcripts found in the tr.gff3 file.
