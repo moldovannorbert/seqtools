@@ -3,6 +3,9 @@
 Created on Thu Apr  2 08:30:55 2020
 
 @author: Norbert Moldován
+
+Modified on Jun 4 2020
+Version 0.2
 """
 
 import os.path, pandas as pd, argparse, statistics
@@ -18,6 +21,8 @@ parser.add_argument("--compare", "-c", dest="doCompare", action="store_true",
                     required=False, default=False, help="Compare TSS, TES and intron isoforms of the control and experimental group.\n"
                                                         "Requires the presence of at least one gff3 with a suffix of _control in the input directory!\n"
                                                         "Default: False")
+parser.add_argument("--wobble", "-w", dest="w", type=int, 
+                    required=False, default=0, help="+/- interval in which TSSs and TESs need to be searched. Not effecting splice junctions! Default: 0")
 parser.add_argument("--suffix", "-s", dest="suffix", type=str, 
                     required=False, default="_control", help="The suffix of the control group's gff3. Default: '_control'")
 args = parser.parse_args()
@@ -132,34 +137,45 @@ def TrCompare(controlDf, filename):
         for exComp in controlDf[controlDf.contig == c].exonComp:
             S = controlDf[controlDf.exonComp == exComp].start.tolist()
             E = controlDf[controlDf.exonComp == exComp].end.tolist()
-            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.exonComp == exComp),"Result"] = "no_effect"
+            #print(tsvDf.start, "\n", ([S[0]-args.w, S[0]+args.w]), "\n", tsvDf.start.isin(list(range(S[0]-args.w,S[0]+args.w))))
+            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start.isin(list(range(S[0]-args.w, S[0]+args.w)))) 
+                      & (tsvDf.end.isin(list(range(E[0]-args.w, E[0]+args.w)))),"Result"] = "no_effect"
     #Check if start or end coordinates are the same and if the cell in the Result column is empty
-            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start == S[0]) & (tsvDf.end == E[0]) & (tsvDf.Result.isna()),"Result"] = "diffIntronUse"
+            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start.isin(list(range(S[0]-args.w, S[0]+args.w))))
+                      & (tsvDf.end.isin(list(range(E[0]-args.w, E[0]+args.w)))) & (tsvDf.Result.isna()),"Result"] = "diffIntronUse"
     
     #Alternative polyadenylation detection with longer UTR on + strand
-            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start == S[0]) & (tsvDf.end > E[0]) & (tsvDf.Result.isna()) & (tsvDf.strand == "+"),"Result"] = "APA_L"
+            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start.isin(list(range(S[0]-args.w, S[0]+args.w)))) 
+                      & (tsvDf.end > E[0]+args.w) & (tsvDf.Result.isna()) & (tsvDf.strand == "+"),"Result"] = "APA_L"
     
     #Alternative polyadenylation detection with shorter UTR on + strand
-            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start == S[0]) & (tsvDf.end < E[0]) & (tsvDf.strand == "+") & (tsvDf.Result.isna()),"Result"] = "APA_S"
+            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start.isin(list(range(S[0]-args.w, S[0]+args.w)))) 
+                      & (tsvDf.end < E[0]-args.w) & (tsvDf.strand == "+") & (tsvDf.Result.isna()),"Result"] = "APA_S"
     
     #Alternative start site detection with longer UTR on + strand
-            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start < S[0]) & (tsvDf.end == E[0]) & (tsvDf.Result.isna()) & (tsvDf.strand == "+"),"Result"] = "ASS_L"
+            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start < S[0]-args.w) 
+                      & (tsvDf.end.isin(list(range(E[0]-args.w, E[0]+args.w)))) & (tsvDf.Result.isna()) & (tsvDf.strand == "+"),"Result"] = "ASS_L"
     
     #Alternative start site detection with shorter UTR on + strand
-            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start > S[0]) & (tsvDf.end == E[0]) & (tsvDf.strand == "+") & (tsvDf.Result.isna()),"Result"] = "ASS_S"
+            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start > S[0]+args.w) 
+                      & (tsvDf.end.isin(list(range(E[0]-args.w, E[0]+args.w)))) & (tsvDf.strand == "+") & (tsvDf.Result.isna()),"Result"] = "ASS_S"
     
-    
-    #Alternative polyadenylation detection with longer UTR on - strand
-            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start == S[0]) & (tsvDf.end > E[0]) & (tsvDf.Result.isna()) & (tsvDf.strand == "-"),"Result"] = "ASS_L"
-    
-    #Alternative polyadenylation detection with shorter UTR on - strand
-            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start == S[0]) & (tsvDf.end < E[0]) & (tsvDf.strand == "-") & (tsvDf.Result.isna()),"Result"] = "ASS_S"
     
     #Alternative start site detection with longer UTR on - strand
-            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start < S[0]) & (tsvDf.end == E[0]) & (tsvDf.Result.isna()) & (tsvDf.strand == "-"),"Result"] = "APA_L"
+            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start.isin(list(range(S[0]-args.w, S[0]+args.w))))
+                      & (tsvDf.end > E[0]+args.w) & (tsvDf.Result.isna()) & (tsvDf.strand == "-"),"Result"] = "ASS_L"
     
-    #Alternative start site detection with shorter UTR on - strand
-            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start > S[0]) & (tsvDf.end == E[0]) & (tsvDf.strand == "-") & (tsvDf.Result.isna()),"Result"] = "APA_S"
+    #Alternative start site detection detection with shorter UTR on - strand
+            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start.isin(list(range(S[0]-args.w, S[0]+args.w)))) 
+                      & (tsvDf.end < E[0]-args.w) & (tsvDf.strand == "-") & (tsvDf.Result.isna()),"Result"] = "ASS_S"
+    
+    #Alternative polyadenylation detection with longer UTR on - strand
+            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start < S[0]-args.w) 
+                      & (tsvDf.end.isin(list(range(E[0]-args.w, E[0]+args.w)))) & (tsvDf.Result.isna()) & (tsvDf.strand == "-"),"Result"] = "APA_L"
+    
+    #Alternative polyadenylation detection with shorter UTR on - strand
+            tsvDf.loc[(tsvDf.contig == c) & (tsvDf.start > S[0]+args.w) 
+                      & (tsvDf.end.isin(list(range(E[0]-args.w, E[0]+args.w)))) & (tsvDf.strand == "-") & (tsvDf.Result.isna()),"Result"] = "APA_S"
     
     #Gene not detected in controll
     tsvDf.loc[(tsvDf.Result.isna()),"Result"] = "not_in_controll"

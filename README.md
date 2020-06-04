@@ -162,6 +162,12 @@ This line will output additional information about the type of a transcript in t
 ```sh
 ./tranalyzer.py -i /path/to/input_directory/ -o /path/to/output_directory/ -c
 ``` 
+To change the interval in which TSSs and TESs are considered the same as in the control use the `-w` option followed by an integer. The default value is 0 bp. :
+This line will consider a TSS or TES the same as the control if the TSS or TES is in a ±10 bp interval from the control:
+
+```sh
+./tranalyzer.py -i /path/to/input_directory/ -o /path/to/output_directory/ -w 10
+``` 
 To change the default suffix for the control file use the `-s` option. The default is `_control`.
 This line will change the default suffix of the control files for which the script is looking for in the input directory:
 ```sh
